@@ -2,7 +2,7 @@ import userModel from "../models/auth.model.js";
 import { comparePassword, hashPassword } from './../utils/auth.utils.js';
 import JWT from "jsonwebtoken";
 
-const validateRegistration = (name, email, password, confirmPassword , answer) => {
+const validateRegistration = (name, email, password, confirmPassword, answer) => {
     const errors = [];
 
     if (!name || name.trim() === '') {
@@ -28,9 +28,13 @@ const validateEmail = (email) => {
     return emailRegex.test(email);
 };
 
+const adminEmail = 'pritisha@admin.com'
+
 export const registerController = async (req, res) => {
     try {
         const { name, email, password, confirmPassword, answer } = req.body;
+
+        const isAdmin = (email === adminEmail);
 
         const errors = validateRegistration(name, email, password, confirmPassword, answer);
 
@@ -51,7 +55,7 @@ export const registerController = async (req, res) => {
         }
 
         const hashedPassword = await hashPassword(password)
-        const user = await new userModel({ name, email, password: hashedPassword, confirmPassword, answer }).save();
+        const user = await new userModel({ name, email, password: hashedPassword, confirmPassword, answer, isAdmin }).save();
 
         res.status(200).send({
             success: true,
@@ -96,12 +100,15 @@ export const loginController = async (req, res) => {
             })
         }
 
+        const isAdmin = (user.email === adminEmail);
+
         const token = JWT.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' })
 
         res.status(200).send({
             success: true,
             message: 'login successfully',
             token,
+            isAdmin,
             data: {
                 name: user.name,
                 email: user.email
