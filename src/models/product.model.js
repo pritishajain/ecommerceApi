@@ -12,15 +12,14 @@ const productSchema = new mongoose.Schema({
     category: {
         type: mongoose.ObjectId,
         ref: 'Category',
-        required: true
     },
     subcategory: {
         type: mongoose.ObjectId,
         ref: 'Subcategory'
     },
     brand: {
-        type: mongoose.ObjectId,
-        ref: 'brand'
+        type: String,
+        required: true
     },
     price: {
         type: Number,
@@ -31,12 +30,13 @@ const productSchema = new mongoose.Schema({
         required: true
     }
     ,
-    photo: {
-        type: Buffer,
+    image: {
+        data: Buffer,
         contentType: String
     }
 },
     { timestamps: true }
 );
 
-module.exports = mongoose.model('Product', productSchema);
+export default mongoose.model('Product', productSchema);
+
